@@ -3,11 +3,32 @@ import sys
 from PIL import Image
 from runtime import baked_paths
 
-def adapter_checkpoint(adapter):
-    """Explicit local filename is mandatory in Diffusers offline mode."""
-    from omegaconf import OmegaConf
-    return OmegaConf.create({"sft_path": str(adapter.parent), "sft_weight_name": adapter.name,
-        "sft_adapter_name": "maskflow", "dmd_path": None, "dmd_weight_name": None, "dmd_adapter_name": "dmd"})
+def compatible_adapter_metadata(adapter):
+    """Preserve all active settings; omit only disabled future-version fields."""
+    import inspect
+    import json
+    from peft import LoraConfig
+    from safetensors import safe_open
+    with safe_open(str(adapter), framework="pt", device="cpu") as f:
+        metadata = json.loads(f.metadata()["lora_adapter_metadata"])
+    supported = inspect.signature(LoraConfig).parameters
+    unknown_active = [key for key, value in metadata.items() if key not in supported and value is not None]
+    if unknown_active:
+        raise ValueError("Adapter enables unsupported PEFT settings")
+    compatible = {key: value for key, value in metadata.items() if key in supported}
+    LoraConfig(**compatible)  # Validate before materializing adapter tensors.
+    return compatible
+
+def load_baked_adapter(transformer, adapter):
+    from safetensors.torch import load_file
+    metadata = compatible_adapter_metadata(adapter)
+    # A local state dict avoids offline filename inference and preserves the
+    # explicitly validated metadata (Diffusers re-reads metadata for file paths).
+    state = load_file(str(adapter), device="cpu")
+    transformer.load_lora_adapter(state, adapter_name="maskflow", prefix=None, metadata=metadata)
+    transformer.set_adapter("maskflow")
+    transformer.fuse_lora(lora_scale=1.0, safe_fusing=True, adapter_names=["maskflow"])
+    transformer.unload_lora()
 
 class MaskFlowEngine:
     def __init__(self):
@@ -16,7 +37,6 @@ class MaskFlowEngine:
         from hydra.utils import instantiate
         base, adapter, upstream = baked_paths()
         sys.path.insert(0, str(upstream))
-        from trainer.lora_utils import load_inference_loras
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA unavailable")
         if torch.cuda.get_device_properties(0).total_memory < 75_000_000_000:
@@ -25,8 +45,7 @@ class MaskFlowEngine:
         cfg.pretrained_model = str(base)
         self.pipe = instantiate(cfg, device=torch.device("cuda"), dtype=torch.bfloat16)
         self.pipe.load_pretrained_weights()
-        checkpoint = adapter_checkpoint(adapter)
-        load_inference_loras(self.pipe.transformer, checkpoint, 1.0)
+        load_baked_adapter(self.pipe.transformer, adapter)
         self.pipe.vae.eval(); self.pipe.text_pipeline.text_encoder.eval(); self.pipe.transformer.eval()
         torch.cuda.synchronize()
 
