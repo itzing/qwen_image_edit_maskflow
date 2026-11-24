@@ -32,6 +32,8 @@ RUN python bake_models.py vae && rm -rf /tmp/hf-xet
 RUN python bake_models.py adapter && rm -rf /tmp/hf-xet
 COPY secure.py handler.py engine.py runtime.py ./
 COPY tests ./tests
+COPY LICENSE ./LICENSE
+COPY licenses ./licenses
 ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HOME=/tmp/huggingface
 RUN python bake_models.py verify && python -m unittest discover -s tests -v && \
     python -c "import torch, diffusers, transformers, runpod, boto3, cryptography; import sys; sys.path.insert(0, '/opt/maskflow'); from trainer.lora_utils import load_inference_loras" 
