@@ -46,3 +46,15 @@ class OfflineAdapterTest(unittest.TestCase):
             save_file({"a": torch.ones(1)}, str(path), metadata={"lora_adapter_metadata": json.dumps({"future_option": {"enabled": True}})})
             with self.assertRaisesRegex(ValueError, "unsupported PEFT"):
                 compatible_adapter_metadata(path)
+
+class CompilerRuntimeTest(unittest.TestCase):
+    def test_actual_triton_extension_compiles_and_imports_offline(self):
+        from triton.runtime.build import compile_module_from_src
+        src = """#include <Python.h>
+static PyObject* answer(PyObject* self, PyObject* args) {return PyLong_FromLong(42);}
+static PyMethodDef methods[] = {{"answer", answer, METH_NOARGS, "probe"}, {NULL,NULL,0,NULL}};
+static struct PyModuleDef module = {PyModuleDef_HEAD_INIT,"engui_compiler_probe",NULL,-1,methods};
+PyMODINIT_FUNC PyInit_engui_compiler_probe(void) {return PyModule_Create(&module);}
+"""
+        module = compile_module_from_src(src, "engui_compiler_probe")
+        self.assertEqual(module.answer(), 42)

@@ -6,7 +6,7 @@ ENV UV_PYTHON_INSTALL_DIR=/opt/python UV_CACHE_DIR=/tmp/uv-cache \
     HF_HUB_DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 TOKENIZERS_PARALLELISM=false \
     PYTHONUNBUFFERED=1 HF_XET_CHUNK_CACHE_SIZE_BYTES=0 HF_XET_CACHE=/tmp/hf-xet
 ENV NVIDIA_VISIBLE_DEVICES=all NVIDIA_DRIVER_CAPABILITIES=compute,utility
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl libgomp1 libgl1 libglib2.0-0 libsm6 libxext6 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl build-essential libgomp1 libgl1 libglib2.0-0 libsm6 libxext6 && rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/engui-maskflow
 COPY pins.json REQUIREMENTS.runtime.txt ./
 RUN python3 -m pip install --no-cache-dir uv==0.13.9 && \

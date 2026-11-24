@@ -1,5 +1,6 @@
-# Code-only repair on the immutable verified weights/runtime image.
+# Runtime/code repair on the immutable verified model-weight image.
 FROM itzing/qwen-image-edit-maskflow@sha256:08608a94c6b78825067067a1c77a9bb50a2361c781677f9b6587f7cca09e8645
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
 COPY handler.py engine.py /opt/engui-maskflow/
 COPY tests /opt/engui-maskflow/tests
 RUN python -m unittest discover -s tests -v

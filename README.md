@@ -15,7 +15,7 @@ Pinned upstream [MaskFlow](https://github.com/ReyChiaro/MaskFlow), Qwen 2511 and
 ## Secret environment
 
 - `FIELD_ENC_KEY_B64`: Engui shared 32-byte master key, base64 (or a provider-managed secret resolved into this environment variable).
-- `ENGUI_S3_ENDPOINT`, `ENGUI_S3_BUCKET`, `ENGUI_S3_REGION`, `ENGUI_S3_ACCESS_KEY`, `ENGUI_S3_SECRET_KEY`: existing encrypted transport bucket. HTTPS required. It may be in a different region from the model cache; only ciphertext is transferred.
+- `ENGUI_S3_ENDPOINT`, `ENGUI_S3_BUCKET`, `ENGUI_S3_REGION`, `ENGUI_S3_ACCESS_KEY`, `ENGUI_S3_SECRET_KEY`: existing encrypted transport bucket. HTTPS required. It may be in a different region from the worker; only ciphertext is transferred.
 - Model files are baked under `/opt/models`; source/runtime under `/opt/maskflow`. No persistent model-cache mount is required. Keep default local paths unless constructing a separately verified image.
 
 Never put secret values in the repository, request examples, startup command or image. Provider environment is managed outside version control.
@@ -36,9 +36,11 @@ Engui exposes this as a dedicated MCP-only model; ordinary Qwen and UI are uncha
 
 ## Validation
 
-`python3 -m unittest discover -s tests -v` requires cryptography and Pillow. The 21 CPU tests use an in-memory fake engine/storage, never GPU or paid inference. They check encrypted roundtrip, authentication tampering, wrong key/role/attempt, path traversal, opaque/grayscale/aligned masks and resource bounds.
+Run the full 28-test CPU suite inside the baked image with `docker run --rm --network none --entrypoint /opt/maskflow/.venv/bin/python IMAGE -m unittest discover -s tests -v`. It checks encrypted roundtrip, authentication, path/size/mask bounds, secret-free diagnostics, actual pinned adapter metadata compatibility, real PEFT load/fuse/unload, and compilation/import of a real Triton C extension. It does not need a GPU or paid inference. Lightweight protocol-only tests can run with cryptography and Pillow using `python3 -m unittest discover -s tests -p test_contract.py -v`.
 
-A separate real GPU test on 2026-11-24 completed one encrypted 512x512 synthetic edit using revision `c6d5815`, the same pinned model/runtime/engine as the current handler. Provider execution was 94.9 seconds after 53.2 seconds of queue delay. The output decrypted successfully. Background more than 25 pixels outside the mask was pixel-identical to the input. The model also added an unwanted white shape inside the editable region: this verifies operation and background preservation in that sample, not perfect instruction following or a general benchmark.
+The image includes `build-essential`: Triton requires a C compiler and Python headers for runtime driver bindings. The adapter was saved with PEFT 0.20 metadata while upstream pins PEFT 0.19.1. The loader preserves every active setting and omits only unsupported fields whose values are `null`; unknown active settings fail explicitly. Adapter tensors are loaded directly from the baked safetensors file, avoiding offline filename discovery. Weight values and LoRA scale are unchanged.
+
+A separate real GPU test on 2026-11-24 completed one encrypted 512x512 synthetic edit using the earlier bootstrap deployment revision `c6d5815`. This is historical evidence, not verification of the replacement baked image. Provider execution was 94.9 seconds after 53.2 seconds of queue delay. The output decrypted successfully. Background more than 25 pixels outside the mask was pixel-identical to the input. The model also added an unwanted white shape inside the editable region: this verifies operation and background preservation in that sample, not perfect instruction following or a general benchmark.
 
 Revision `501930b` additionally rejects transparent palette masks before inference; the updated 19-test CPU suite passed. No second GPU inference was needed for that validation-only change.
 
