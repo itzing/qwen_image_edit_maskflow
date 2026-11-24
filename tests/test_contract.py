@@ -48,6 +48,17 @@ class ContractTest(unittest.TestCase):
     def test_foreign_path(self):self.job["input"]["media_inputs"][0]["storage_path"]=ROOT+"foreign.bin";self.reject()
     def test_traversal_path(self):self.job["input"]["media_inputs"][0]["storage_path"]=ROOT+"test-job__attempt-1__input__../x";self.reject()
     def test_empty_mask(self):self.add("edit_mask",png(0,"L"));self.reject()
+    def test_transparent_rgba_mask(self):self.add("edit_mask",png((255,255,255,0),"RGBA"));self.reject()
+    def test_transparent_palette_mask(self):
+        image=Image.new("P",(256,256),1)
+        image.putpalette([0,0,0,255,255,255]+[0]*762)
+        out=io.BytesIO();image.save(out,format="PNG",transparency=1)
+        self.add("edit_mask",out.getvalue());self.reject()
+    def test_opaque_palette_mask(self):
+        image=Image.new("P",(256,256),1)
+        image.putpalette([0,0,0,255,255,255]+[0]*762)
+        out=io.BytesIO();image.save(out,format="PNG")
+        self.add("edit_mask",out.getvalue());self.run_job();self.assertEqual(self.calls,1)
     def test_colored_mask(self):self.add("edit_mask",png("red"));self.reject()
     def test_misaligned_mask(self):self.add("edit_mask",png(255,"L",(128,128)));self.reject()
     def test_missing_mask(self):self.job["input"]["media_inputs"].pop();self.reject()
