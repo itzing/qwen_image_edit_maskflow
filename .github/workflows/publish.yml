@@ -1,0 +1,64 @@
+name: Publish self-contained endpoint
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-maskflow
+  cancel-in-progress: false
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Reclaim unused hosted-runner SDKs
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache
+          docker system prune -af --volumes
+          df -h /
+          python3 - <<'PYCODE'
+          import shutil
+          free = shutil.disk_usage('/').free / 1024**3
+          print(f'Available build space: {free:.1f} GiB')
+          assert free >= 72, 'Insufficient space for baked model image; no build started'
+          PYCODE
+      - name: Configure registry authentication
+        env:
+          REGISTRY_AUTH_CONFIG: ${{ secrets.DOCKERHUB_AUTH_CONFIG }}
+        run: |
+          test -n "$REGISTRY_AUTH_CONFIG"
+          install -m 700 -d "$HOME/.docker"
+          printf '%s' "$REGISTRY_AUTH_CONFIG" > "$HOME/.docker/config.json"
+          chmod 600 "$HOME/.docker/config.json"
+      - name: Build pinned weights and runtime
+        run: |
+          set -o pipefail
+          docker build --progress=plain \
+            --label org.opencontainers.image.source=https://github.com/itzing/qwen_image_edit_maskflow \
+            --label org.opencontainers.image.revision="$GITHUB_SHA" \
+            -t itzing/qwen-image-edit-maskflow:baked-"$GITHUB_SHA" . 2>&1 | tee build.log
+      - name: Prove offline model files and imports
+        run: |
+          docker run --rm --network none --entrypoint /opt/maskflow/.venv/bin/python \
+            itzing/qwen-image-edit-maskflow:baked-"$GITHUB_SHA" \
+            -c "from runtime import baked_paths; from bake_models import verify_all; import os,torch,diffusers,transformers; assert os.environ['HF_HUB_OFFLINE']=='1'; assert verify_all()==34; assert torch.version.cuda=='13.0'; print('OFFLINE_VERIFIED',baked_paths(),torch.__version__)"
+      - name: Publish immutable image
+        run: |
+          set -o pipefail
+          docker push itzing/qwen-image-edit-maskflow:baked-"$GITHUB_SHA" 2>&1 | tee push.log
+      - name: Upload non-secret build evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: image-build-evidence
+          path: |
+            build.log
+            push.log
+          if-no-files-found: ignore
+      - name: Remove runner registry credentials
+        if: always()
+        run: rm -f "$HOME/.docker/config.json"
