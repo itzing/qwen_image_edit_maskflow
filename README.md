@@ -4,7 +4,7 @@ Secure-only RunPod queue endpoint for masked image editing. Model ID: `qwen-imag
 
 ## Runtime: self-contained Docker image
 
-Build with `docker build -t itzing/qwen-image-edit-maskflow:v1 .` and deploy the resulting immutable registry digest. The image contains the pinned Qwen 2511 base, MaskFlow adapter and source, Python 3.12 environment and every runtime dependency. No model download, pip installation, Git checkout or network model-cache volume is needed at worker startup. The compact Python base avoids a duplicate PyTorch installation; the official locked runtime supplies PyTorch 2.8.0+cu128 and its CUDA libraries.
+Build with `docker build -t itzing/qwen-image-edit-maskflow:v1 .` and deploy the resulting immutable registry digest. The image contains the pinned Qwen 2511 base, MaskFlow adapter and source, Python 3.12 environment and every runtime dependency. No model download, pip installation, Git checkout or network model-cache volume is needed at worker startup. The compact Python base avoids a duplicate PyTorch installation; the pinned official lock supplies PyTorch 2.13.0 / CUDA 13.0 and its CUDA libraries. The upstream pyproject declares an older torch version, but `uv sync --frozen` follows the pinned lock. Use a CUDA 13-capable driver; do not infer runtime compatibility from the older pyproject or base-image label.
 
 `weights.lock.json` records 34 files (approximately 60.17 GB) with immutable revisions, sizes and checksum metadata. Downloads and checksum verification happen at image build time, in separate model-shard layers. Runtime enforces `HF_HUB_OFFLINE=1` / `TRANSFORMERS_OFFLINE=1` and fails if baked files are absent or incomplete; there is no download fallback. Only the existing encrypted S3 transport requires network access.
 
