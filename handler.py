@@ -20,6 +20,8 @@ def decode_image(data, mask=False):
         if mask:
             # Alpha is never implicitly interpreted as the edit region.
             require(image.mode in ("1", "L", "LA", "RGB", "RGBA", "P"), "Invalid mask format")
+            if "A" in image.getbands():
+                require(image.getchannel("A").getextrema() == (255, 255), "Mask must be opaque")
             rgb = image.convert("RGB")
             r, g, b = rgb.split()
             from PIL import ImageChops
