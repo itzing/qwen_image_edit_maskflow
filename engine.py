@@ -3,6 +3,12 @@ import sys
 from PIL import Image
 from runtime import baked_paths
 
+def adapter_checkpoint(adapter):
+    """Explicit local filename is mandatory in Diffusers offline mode."""
+    from omegaconf import OmegaConf
+    return OmegaConf.create({"sft_path": str(adapter.parent), "sft_weight_name": adapter.name,
+        "sft_adapter_name": "maskflow", "dmd_path": None, "dmd_weight_name": None, "dmd_adapter_name": "dmd"})
+
 class MaskFlowEngine:
     def __init__(self):
         import torch
@@ -19,7 +25,7 @@ class MaskFlowEngine:
         cfg.pretrained_model = str(base)
         self.pipe = instantiate(cfg, device=torch.device("cuda"), dtype=torch.bfloat16)
         self.pipe.load_pretrained_weights()
-        checkpoint = OmegaConf.create({"sft_path": str(adapter), "sft_weight_name": None, "sft_adapter_name": "maskflow", "dmd_path": None, "dmd_weight_name": None, "dmd_adapter_name": "dmd"})
+        checkpoint = adapter_checkpoint(adapter)
         load_inference_loras(self.pipe.transformer, checkpoint, 1.0)
         self.pipe.vae.eval(); self.pipe.text_pipeline.text_encoder.eval(); self.pipe.transformer.eval()
         torch.cuda.synchronize()
