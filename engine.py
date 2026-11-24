@@ -1,10 +1,6 @@
 """Pinned official MaskFlow baseline; no ComfyUI/Lightning substitution."""
-import json
-import os
 import sys
-from pathlib import Path
 from PIL import Image
-import time
 from runtime import baked_paths
 
 class MaskFlowEngine:
@@ -12,7 +8,6 @@ class MaskFlowEngine:
         import torch
         from omegaconf import OmegaConf
         from hydra.utils import instantiate
-        started = time.perf_counter()
         base, adapter, upstream = baked_paths()
         sys.path.insert(0, str(upstream))
         from trainer.lora_utils import load_inference_loras
@@ -28,8 +23,6 @@ class MaskFlowEngine:
         load_inference_loras(self.pipe.transformer, checkpoint, 1.0)
         self.pipe.vae.eval(); self.pipe.text_pipeline.text_encoder.eval(); self.pipe.transformer.eval()
         torch.cuda.synchronize()
-        self.load_ms = round((time.perf_counter() - started) * 1000)
-        print(json.dumps({"event": "model_loaded", "modelLoadMs": self.load_ms}), flush=True)
 
     def __call__(self, source, mask, prompt, settings):
         import torch

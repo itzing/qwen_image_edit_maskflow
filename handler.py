@@ -92,6 +92,7 @@ def handler(job):
     try:
         def run_engine(*args):
             global _ENGINE
+            timings["modelWasWarm"] = _ENGINE is not None
             if _ENGINE is None:
                 loading = time.perf_counter()
                 from engine import MaskFlowEngine
