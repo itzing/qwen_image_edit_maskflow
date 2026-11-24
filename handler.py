@@ -3,6 +3,9 @@ import io
 import json
 import threading
 import time
+import os
+import sys
+import traceback
 from PIL import Image, ImageOps
 from secure import MODEL, ROOT, InvalidRequest, require, key_from_env, binding_from, decrypt, encrypt, storage_key, S3Store, MAX_IMAGE
 
@@ -88,19 +91,28 @@ def process(job, engine, store, master):
 def handler(job):
     global _ENGINE
     started = time.perf_counter()
+    stage = "secure_input"
     timings = {"modelLoadMs": 0, "inferenceMs": 0, "modelWasWarm": _ENGINE is not None}
     try:
         def run_engine(*args):
             global _ENGINE
+            nonlocal stage
             timings["modelWasWarm"] = _ENGINE is not None
             if _ENGINE is None:
+                stage = "model_initialization"
                 loading = time.perf_counter()
-                from engine import MaskFlowEngine
-                _ENGINE = MaskFlowEngine()
-                timings["modelLoadMs"] = round((time.perf_counter() - loading) * 1000)
+                try:
+                    from engine import MaskFlowEngine
+                    _ENGINE = MaskFlowEngine()
+                finally:
+                    timings["modelLoadMs"] = round((time.perf_counter() - loading) * 1000)
+            stage = "inference"
             inference = time.perf_counter()
-            result = _ENGINE(*args)
-            timings["inferenceMs"] = round((time.perf_counter() - inference) * 1000)
+            try:
+                result = _ENGINE(*args)
+            finally:
+                timings["inferenceMs"] = round((time.perf_counter() - inference) * 1000)
+            stage = "secure_output"
             return result
         result = process(job, run_engine, S3Store(), key_from_env())
         timings["handlerMs"] = round((time.perf_counter() - started) * 1000)
@@ -110,9 +122,23 @@ def handler(job):
     except InvalidRequest as e:
         return {"transport_result": {"status": "failed", "error": {"code": "INVALID_SECURE_REQUEST", "message": str(e)}}}
     except Exception as error:
-        print("MaskFlow failure class:", type(error).__name__, flush=True)
-        # Third-party exception messages can contain prompts/credentials. Never echo them.
-        return {"transport_result": {"status": "failed", "error": {"code": "MASKFLOW_FAILED", "message": "MaskFlow execution failed; inspect secret-free worker health."}}}
+        timings["handlerMs"] = round((time.perf_counter() - started) * 1000)
+        # Never include exception messages, source lines, locals or input values.
+        cause = error.__cause__ or error
+        diagnostics = {"stage": stage, "exceptionType": type(error).__name__, "causeType": type(cause).__name__,
+            "frames": [{"file": os.path.basename(f.filename), "line": f.lineno, "function": f.name}
+                for f in traceback.extract_tb(cause.__traceback__)[-6:]]}
+        torch = sys.modules.get("torch")
+        if torch is not None:
+            try:
+                diagnostics["cudaAvailable"] = bool(torch.cuda.is_available())
+                diagnostics["torchVersion"] = str(torch.__version__)
+                if diagnostics["cudaAvailable"]:
+                    diagnostics["gpuMemoryBytes"] = torch.cuda.get_device_properties(0).total_memory
+            except Exception:
+                diagnostics["cudaProbeFailed"] = True
+        print(json.dumps({"event": "generation_failed", **diagnostics, **timings}), flush=True)
+        return {"transport_result": {"status": "failed", "timings": timings, "error": {"code": "MASKFLOW_FAILED", "message": "MaskFlow execution failed; see safe diagnostics.", "diagnostics": diagnostics}}}
 
 if __name__ == "__main__":
     import runpod

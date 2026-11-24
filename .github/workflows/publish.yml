@@ -1,6 +1,12 @@
 name: Publish self-contained endpoint
 on:
   workflow_dispatch:
+    inputs:
+      build_file:
+        type: choice
+        description: Full rebuild or code-only repair over the pinned image
+        default: Dockerfile
+        options: [Dockerfile, Dockerfile.patch]
 permissions:
   contents: read
 concurrency:
@@ -35,9 +41,11 @@ jobs:
           printf '%s' "$REGISTRY_AUTH_CONFIG" > "$HOME/.docker/config.json"
           chmod 600 "$HOME/.docker/config.json"
       - name: Build pinned weights and runtime
+        env:
+          BUILD_FILE: ${{ inputs.build_file }}
         run: |
           set -o pipefail
-          docker build --progress=plain \
+          docker build --progress=plain -f "$BUILD_FILE" \
             --label org.opencontainers.image.source=https://github.com/itzing/qwen_image_edit_maskflow \
             --label org.opencontainers.image.revision="$GITHUB_SHA" \
             -t itzing/qwen-image-edit-maskflow:baked-"$GITHUB_SHA" . 2>&1 | tee build.log

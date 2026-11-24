@@ -1,0 +1,5 @@
+# Code-only repair on the immutable verified weights/runtime image.
+FROM itzing/qwen-image-edit-maskflow@sha256:08608a94c6b78825067067a1c77a9bb50a2361c781677f9b6587f7cca09e8645
+COPY handler.py /opt/engui-maskflow/handler.py
+COPY tests /opt/engui-maskflow/tests
+RUN python -m unittest discover -s tests -v

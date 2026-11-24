@@ -59,6 +59,31 @@ class ContractTest(unittest.TestCase):
         self.assertFalse(first["timings"]["modelWasWarm"])
         self.assertTrue(second["timings"]["modelWasWarm"])
         self.assertEqual(self.calls,2)
+    def test_initialization_failure_reports_stage_without_exception_message(self):
+        secret = "PROMPT_AND_CREDENTIAL_MUST_NOT_APPEAR"
+        def fail(): raise RuntimeError(secret)
+        fake = SimpleNamespace(MaskFlowEngine=fail)
+        from contextlib import redirect_stdout
+        output = io.StringIO()
+        with patch.object(handler_module,"_ENGINE",None), patch.object(handler_module,"S3Store",return_value=self.store), patch.object(handler_module,"key_from_env",return_value=self.key), patch.dict("sys.modules",{"engine":fake}), redirect_stdout(output):
+            result = handler_module.handler(self.job)["transport_result"]
+        self.assertEqual(result["error"]["diagnostics"]["stage"], "model_initialization")
+        self.assertEqual(result["error"]["diagnostics"]["exceptionType"], "RuntimeError")
+        self.assertNotIn(secret, json.dumps(result) + output.getvalue())
+        self.assertGreaterEqual(result["timings"]["handlerMs"], result["timings"]["modelLoadMs"])
+        self.assertEqual(self.calls, 0)
+    def test_warm_inference_failure_has_own_stage(self):
+        def fail(*args): raise ValueError("private prompt")
+        with patch.object(handler_module,"_ENGINE",fail), patch.object(handler_module,"S3Store",return_value=self.store), patch.object(handler_module,"key_from_env",return_value=self.key):
+            result=handler_module.handler(self.job)["transport_result"]
+        self.assertEqual(result["error"]["diagnostics"]["stage"], "inference")
+        self.assertTrue(result["timings"]["modelWasWarm"])
+        self.assertEqual(result["timings"]["modelLoadMs"],0)
+    def test_storage_failure_is_distinct_from_model_failure(self):
+        with patch.object(handler_module,"_ENGINE",self.engine), patch.object(handler_module,"S3Store",side_effect=RuntimeError("private access key")):
+            result=handler_module.handler(self.job)["transport_result"]
+        self.assertEqual(result["error"]["diagnostics"]["stage"], "secure_input")
+        self.assertEqual(self.calls,0)
     def test_plaintext_rejected(self):self.job["input"]["prompt"]="secret";self.reject()
     def test_tampered_prompt(self):self.job["input"]["_secure"]["binding"]["attempt_id"]="other";self.reject()
     def test_wrong_key(self):self.key=os.urandom(32);self.reject()
