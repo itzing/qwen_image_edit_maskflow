@@ -4,31 +4,32 @@ import os
 import sys
 from pathlib import Path
 from PIL import Image
+import time
+from runtime import baked_paths
 
 class MaskFlowEngine:
     def __init__(self):
         import torch
         from omegaconf import OmegaConf
         from hydra.utils import instantiate
-        from huggingface_hub import snapshot_download, hf_hub_download
-        pins = json.loads((Path(__file__).parent / "pins.json").read_text())
-        upstream = Path(os.environ["MASKFLOW_SOURCE"])
+        started = time.perf_counter()
+        base, adapter, upstream = baked_paths()
         sys.path.insert(0, str(upstream))
         from trainer.lora_utils import load_inference_loras
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA unavailable")
         if torch.cuda.get_device_properties(0).total_memory < 75_000_000_000:
-            raise RuntimeError("MaskFlow baseline requires an80GB-class GPU")
-        base = snapshot_download(pins["base_model"], revision=pins["base_revision"],
-            allow_patterns=["model_index.json", "scheduler/*", "tokenizer/*", "processor/*", "text_encoder/*", "transformer/*", "vae/*"])
-        adapter = hf_hub_download(pins["adapter_model"], pins["adapter_file"], revision=pins["adapter_revision"])
+            raise RuntimeError("MaskFlow baseline requires an 80GB-class GPU")
         cfg = OmegaConf.load(upstream / "configs/pipeline/qwenimage_maskflow.yaml")
-        cfg.pretrained_model = base
+        cfg.pretrained_model = str(base)
         self.pipe = instantiate(cfg, device=torch.device("cuda"), dtype=torch.bfloat16)
         self.pipe.load_pretrained_weights()
-        checkpoint = OmegaConf.create({"sft_path": adapter, "sft_weight_name": None, "sft_adapter_name": "maskflow", "dmd_path": None, "dmd_weight_name": None, "dmd_adapter_name": "dmd"})
+        checkpoint = OmegaConf.create({"sft_path": str(adapter), "sft_weight_name": None, "sft_adapter_name": "maskflow", "dmd_path": None, "dmd_weight_name": None, "dmd_adapter_name": "dmd"})
         load_inference_loras(self.pipe.transformer, checkpoint, 1.0)
         self.pipe.vae.eval(); self.pipe.text_pipeline.text_encoder.eval(); self.pipe.transformer.eval()
+        torch.cuda.synchronize()
+        self.load_ms = round((time.perf_counter() - started) * 1000)
+        print(json.dumps({"event": "model_loaded", "modelLoadMs": self.load_ms}), flush=True)
 
     def __call__(self, source, mask, prompt, settings):
         import torch

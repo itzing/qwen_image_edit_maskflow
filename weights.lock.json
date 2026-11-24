@@ -1,0 +1,345 @@
+{
+  "schema": 1,
+  "files": [
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "model_index.json",
+      "target": "qwen2511/model_index.json",
+      "size": 516,
+      "sha256": null,
+      "gitBlob": "a2e083f28f4f6c958c08f3882c89038b8f6da872",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/added_tokens.json",
+      "target": "qwen2511/processor/added_tokens.json",
+      "size": 605,
+      "sha256": null,
+      "gitBlob": "482ced4679301bf287ebb310bdd1790eb4514232",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/chat_template.jinja",
+      "target": "qwen2511/processor/chat_template.jinja",
+      "size": 1017,
+      "sha256": null,
+      "gitBlob": "6c226632394ae7474b0d4b13e15793eac2e21ee9",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/merges.txt",
+      "target": "qwen2511/processor/merges.txt",
+      "size": 1671853,
+      "sha256": null,
+      "gitBlob": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/preprocessor_config.json",
+      "target": "qwen2511/processor/preprocessor_config.json",
+      "size": 826,
+      "sha256": null,
+      "gitBlob": "9a24c5165e5de348ba27d0d00dd52b27c6044ab2",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/special_tokens_map.json",
+      "target": "qwen2511/processor/special_tokens_map.json",
+      "size": 613,
+      "sha256": null,
+      "gitBlob": "ac23c0aaa2434523c494330aeb79c58395378103",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/tokenizer.json",
+      "target": "qwen2511/processor/tokenizer.json",
+      "size": 11421896,
+      "sha256": "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa",
+      "gitBlob": "51ebb3ba93988c73bbd83a3c163a14343fbc5b06",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/tokenizer_config.json",
+      "target": "qwen2511/processor/tokenizer_config.json",
+      "size": 4727,
+      "sha256": null,
+      "gitBlob": "203eb2267a9b927c93a97b67990818164bf3c692",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/video_preprocessor_config.json",
+      "target": "qwen2511/processor/video_preprocessor_config.json",
+      "size": 910,
+      "sha256": null,
+      "gitBlob": "ef8f979d86a2255c8fc115327eefce152e5a7cf3",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "processor/vocab.json",
+      "target": "qwen2511/processor/vocab.json",
+      "size": 2776833,
+      "sha256": null,
+      "gitBlob": "4783fe10ac3adce15ac8f358ef5462739852c569",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "scheduler/scheduler_config.json",
+      "target": "qwen2511/scheduler/scheduler_config.json",
+      "size": 485,
+      "sha256": null,
+      "gitBlob": "f400c338630cdaa261c6575648f374eba547b9c6",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "text_encoder/config.json",
+      "target": "qwen2511/text_encoder/config.json",
+      "size": 3146,
+      "sha256": null,
+      "gitBlob": "52b1556c2927e08c13529f2a107b08c87c7a4e65",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "text_encoder/generation_config.json",
+      "target": "qwen2511/text_encoder/generation_config.json",
+      "size": 244,
+      "sha256": null,
+      "gitBlob": "5fdb82f3b3f12d83074ce7b45e330d8ee4efb7d7",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "text_encoder/model-00001-of-00004.safetensors",
+      "target": "qwen2511/text_encoder/model-00001-of-00004.safetensors",
+      "size": 4968243304,
+      "sha256": "d725335e4ea2399be706469e4b8807716a8fa64bd03468252e9f7acf2415fee4",
+      "gitBlob": "184b37ee89f2f2e1a3cfd32094f3a6b620abb892",
+      "group": "encoder-1"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "text_encoder/model-00002-of-00004.safetensors",
+      "target": "qwen2511/text_encoder/model-00002-of-00004.safetensors",
+      "size": 4991495816,
+      "sha256": "b1830db6908dcc76df3a71492acbcf2b8cac130114cf1f3c2d9edae8de8c6de3",
+      "gitBlob": "39c7b109b36e503a584b9e6570ff44ee51f99eaa",
+      "group": "encoder-2"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "text_encoder/model-00003-of-00004.safetensors",
+      "target": "qwen2511/text_encoder/model-00003-of-00004.safetensors",
+      "size": 4932751040,
+      "sha256": "09c1807c6d00d7cab94f7db39d4c02ebb8537225ccde383861ac48db97945aa6",
+      "gitBlob": "550aeb0dada74ffbd038b974d8558c45231a2349",
+      "group": "encoder-3"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "text_encoder/model-00004-of-00004.safetensors",
+      "target": "qwen2511/text_encoder/model-00004-of-00004.safetensors",
+      "size": 1691924384,
+      "sha256": "5dd068336d14d45ffb43cef374d286cc6ba9d8741b028f90a7d040d847961f4a",
+      "gitBlob": "e4d8aef129d402105054573957c663123303830a",
+      "group": "encoder-4"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "text_encoder/model.safetensors.index.json",
+      "target": "qwen2511/text_encoder/model.safetensors.index.json",
+      "size": 57655,
+      "sha256": null,
+      "gitBlob": "92b467639266f4aa72a9b5ab73dbdf5a1f936ee4",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "tokenizer/added_tokens.json",
+      "target": "qwen2511/tokenizer/added_tokens.json",
+      "size": 605,
+      "sha256": null,
+      "gitBlob": "482ced4679301bf287ebb310bdd1790eb4514232",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "tokenizer/chat_template.jinja",
+      "target": "qwen2511/tokenizer/chat_template.jinja",
+      "size": 2427,
+      "sha256": null,
+      "gitBlob": "28028c056af412405debd878cdda0171e35fa5d1",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "tokenizer/merges.txt",
+      "target": "qwen2511/tokenizer/merges.txt",
+      "size": 1671853,
+      "sha256": null,
+      "gitBlob": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "tokenizer/special_tokens_map.json",
+      "target": "qwen2511/tokenizer/special_tokens_map.json",
+      "size": 613,
+      "sha256": null,
+      "gitBlob": "ac23c0aaa2434523c494330aeb79c58395378103",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "tokenizer/tokenizer_config.json",
+      "target": "qwen2511/tokenizer/tokenizer_config.json",
+      "size": 4686,
+      "sha256": null,
+      "gitBlob": "eaed590d62aaf0ba31e284b66ddcb18222f066c2",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "tokenizer/vocab.json",
+      "target": "qwen2511/tokenizer/vocab.json",
+      "size": 3383407,
+      "sha256": null,
+      "gitBlob": "6bce3a0a3866c4791a74d83d78f6824c3af64ec3",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "transformer/config.json",
+      "target": "qwen2511/transformer/config.json",
+      "size": 362,
+      "sha256": null,
+      "gitBlob": "199398df180d275eee9da066489f9bb6e2b97609",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "transformer/diffusion_pytorch_model-00001-of-00005.safetensors",
+      "target": "qwen2511/transformer/diffusion_pytorch_model-00001-of-00005.safetensors",
+      "size": 9973578592,
+      "sha256": "2a0c30c9ba44a5f11c21ca139e37951430bbde814ff4e0b5b1a68b80530e7a1a",
+      "gitBlob": "5aaa7c50c84092816e872acd26f54b27526ee54c",
+      "group": "transformer-1"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "transformer/diffusion_pytorch_model-00002-of-00005.safetensors",
+      "target": "qwen2511/transformer/diffusion_pytorch_model-00002-of-00005.safetensors",
+      "size": 9987326072,
+      "sha256": "54ec249b07b4376e19cf16b764054f03ca03ae2cfbd9939453e2085f4e9bd259",
+      "gitBlob": "bed33d1e9c920fcd65d178038abea2d16c270261",
+      "group": "transformer-2"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "transformer/diffusion_pytorch_model-00003-of-00005.safetensors",
+      "target": "qwen2511/transformer/diffusion_pytorch_model-00003-of-00005.safetensors",
+      "size": 9987307440,
+      "sha256": "c55157843525653161e8f6af5acc670ba3aceff04284f7cf657199d24d065e16",
+      "gitBlob": "8f3fcdef0deb1d03ad76e9f02b2d1626518f216d",
+      "group": "transformer-3"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "transformer/diffusion_pytorch_model-00004-of-00005.safetensors",
+      "target": "qwen2511/transformer/diffusion_pytorch_model-00004-of-00005.safetensors",
+      "size": 9930685712,
+      "sha256": "ffcfb5a4895702635890a67bad183591e0ae515d794bdcb26e217b27a7f6d12d",
+      "gitBlob": "bc77ec9ed820459ecab4e259f1310d04df2a3bd0",
+      "group": "transformer-4"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "transformer/diffusion_pytorch_model-00005-of-00005.safetensors",
+      "target": "qwen2511/transformer/diffusion_pytorch_model-00005-of-00005.safetensors",
+      "size": 982130472,
+      "sha256": "2b2556b736629e10a5a0dfa14606f2057f4f81c2ba53f94103682c7ac42d4940",
+      "gitBlob": "22353f9ff2f617a2e881c02010111b104f172cdf",
+      "group": "transformer-5"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "transformer/diffusion_pytorch_model.safetensors.index.json",
+      "target": "qwen2511/transformer/diffusion_pytorch_model.safetensors.index.json",
+      "size": 198887,
+      "sha256": null,
+      "gitBlob": "2fdb0449e2b2299b77e056c95b1a7caec5a3f438",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "vae/config.json",
+      "target": "qwen2511/vae/config.json",
+      "size": 730,
+      "sha256": null,
+      "gitBlob": "ebc479e2fe5a2265f4bcaf1e1073df64a2d4e33e",
+      "group": "configs"
+    },
+    {
+      "repo": "Qwen/Qwen-Image-Edit-2511",
+      "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "path": "vae/diffusion_pytorch_model.safetensors",
+      "target": "qwen2511/vae/diffusion_pytorch_model.safetensors",
+      "size": 253806966,
+      "sha256": "0c8bc8b758c649abef9ea407b95408389a3b2f610d0d10fcb054fe171d0a8344",
+      "gitBlob": "5c203341583690b7e93ff899368ce1a7dce658a6",
+      "group": "vae"
+    },
+    {
+      "repo": "ReyChiaro/MaskFlow",
+      "revision": "f18f0828ab6a40a7f3456feace7a33bebe8c511e",
+      "path": "latest.safetensors",
+      "target": "adapter/latest.safetensors",
+      "size": 2453820032,
+      "sha256": "773e815a209ebf948dbe0cf76492dd658cc16030f8119471cc553edb208de7b0",
+      "gitBlob": "0f0f81d7e122171ea1c243ac13bdd3b6621dc1b6",
+      "group": "adapter"
+    }
+  ]
+}

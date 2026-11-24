@@ -2,6 +2,7 @@
 import io
 import json
 import threading
+import time
 from PIL import Image, ImageOps
 from secure import MODEL, ROOT, InvalidRequest, require, key_from_env, binding_from, decrypt, encrypt, storage_key, S3Store, MAX_IMAGE
 
@@ -86,14 +87,25 @@ def process(job, engine, store, master):
 
 def handler(job):
     global _ENGINE
+    started = time.perf_counter()
+    timings = {"modelLoadMs": 0, "inferenceMs": 0, "modelWasWarm": _ENGINE is not None}
     try:
         def run_engine(*args):
             global _ENGINE
             if _ENGINE is None:
+                loading = time.perf_counter()
                 from engine import MaskFlowEngine
                 _ENGINE = MaskFlowEngine()
-            return _ENGINE(*args)
-        return process(job, run_engine, S3Store(), key_from_env())
+                timings["modelLoadMs"] = round((time.perf_counter() - loading) * 1000)
+            inference = time.perf_counter()
+            result = _ENGINE(*args)
+            timings["inferenceMs"] = round((time.perf_counter() - inference) * 1000)
+            return result
+        result = process(job, run_engine, S3Store(), key_from_env())
+        timings["handlerMs"] = round((time.perf_counter() - started) * 1000)
+        result["transport_result"]["timings"] = timings
+        print(json.dumps({"event": "generation_completed", **timings}), flush=True)
+        return result
     except InvalidRequest as e:
         return {"transport_result": {"status": "failed", "error": {"code": "INVALID_SECURE_REQUEST", "message": str(e)}}}
     except Exception as error:

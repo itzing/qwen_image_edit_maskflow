@@ -3,6 +3,9 @@ import io
 import json
 import os
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
+import handler as handler_module
 from PIL import Image
 from handler import process
 from secure import MODEL, ROOT, InvalidRequest, encrypt, decrypt
@@ -41,6 +44,21 @@ class ContractTest(unittest.TestCase):
         plain=decrypt(self.key,out["envelope"],binding,body)
         self.assertEqual(Image.open(io.BytesIO(plain)).getpixel((0,0)),(255,0,0))
         self.assertEqual(self.calls,1)
+    def test_handler_reports_warm_timing_without_loading(self):
+        with patch.object(handler_module,"_ENGINE",self.engine), patch.object(handler_module,"S3Store",return_value=self.store), patch.object(handler_module,"key_from_env",return_value=self.key):
+            result=handler_module.handler(self.job)["transport_result"]
+        self.assertEqual(result["status"],"completed")
+        self.assertTrue(result["timings"]["modelWasWarm"])
+        self.assertEqual(result["timings"]["modelLoadMs"],0)
+        self.assertGreaterEqual(result["timings"]["handlerMs"],result["timings"]["inferenceMs"])
+    def test_handler_reports_cold_timing_and_reuses_engine(self):
+        fake=SimpleNamespace(MaskFlowEngine=lambda:self.engine)
+        with patch.object(handler_module,"_ENGINE",None), patch.object(handler_module,"S3Store",return_value=self.store), patch.object(handler_module,"key_from_env",return_value=self.key), patch.dict("sys.modules",{"engine":fake}):
+            first=handler_module.handler(self.job)["transport_result"]
+            second=handler_module.handler(self.job)["transport_result"]
+        self.assertFalse(first["timings"]["modelWasWarm"])
+        self.assertTrue(second["timings"]["modelWasWarm"])
+        self.assertEqual(self.calls,2)
     def test_plaintext_rejected(self):self.job["input"]["prompt"]="secret";self.reject()
     def test_tampered_prompt(self):self.job["input"]["_secure"]["binding"]["attempt_id"]="other";self.reject()
     def test_wrong_key(self):self.key=os.urandom(32);self.reject()
