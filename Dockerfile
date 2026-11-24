@@ -1,10 +1,12 @@
 # syntax=docker/dockerfile:1
-FROM runpod/pytorch@sha256:0a360022e8de4375af99430f84e8b38951acc397252163a37ceac7204d01be35
+FROM python@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV UV_PYTHON_INSTALL_DIR=/opt/python UV_CACHE_DIR=/tmp/uv-cache \
     MASKFLOW_SOURCE=/opt/maskflow MASKFLOW_MODEL_ROOT=/opt/models \
     HF_HUB_DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 TOKENIZERS_PARALLELISM=false \
     PYTHONUNBUFFERED=1 HF_XET_CHUNK_CACHE_SIZE_BYTES=0 HF_XET_CACHE=/tmp/hf-xet
+ENV NVIDIA_VISIBLE_DEVICES=all NVIDIA_DRIVER_CAPABILITIES=compute,utility
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl libgomp1 libgl1 libglib2.0-0 libsm6 libxext6 && rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/engui-maskflow
 COPY pins.json REQUIREMENTS.runtime.txt ./
 RUN python3 -m pip install --no-cache-dir uv==0.13.9 && \
